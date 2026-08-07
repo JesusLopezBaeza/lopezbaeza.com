@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Page not found — López-Baeza</title>
+<meta name="description" content="That page doesn&#x27;t exist.">
+<meta property="og:title" content="Page not found — López-Baeza">
+<meta property="og:description" content="That page doesn&#x27;t exist.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="index.html">López-Baeza</a>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="publications.html">Publications</a>
+        <a href="events.html">Events</a>
+        <a href="about.html">About</a>
+        <span class="has-kids" tabindex="0">More <i>+</i><span class="submenu"><a href="tools.html">Tools</a><a href="architecture.html">Architecture</a><a href="graphic-design.html">Graphic Design</a></span></span>
+    </nav>
+  </div>
+</header>
+<main>
+<section class="cover">
+  <div class="wrap">
+    <span class="kicker">Error 404</span>
+    <h1 class="cover-name"><span class="thin">Page</span> not found</h1>
+    <p class="cover-lead">That address doesn't exist on this site. It may have been
+    part of the older version. Everything is reachable from here:</p>
+    <nav class="tiles" aria-label="Sections"><a class="tile" href="index.html"><span class="tile-ico"></span><span class="tile-lab">Home</span></a><a class="tile" href="projects.html"><span class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M3 3h18v18H3z"/><path d="M3 9.5h18M3 15.5h18M9.5 3v18M15.5 3v18"/></svg></span><span class="tile-lab">Projects</span></a><a class="tile" href="publications.html"><span class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 15.5h7M9 8.5h3"/></svg></span><span class="tile-lab">Publications</span></a><a class="tile" href="events.html"><span class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="12"/><path d="M12 16v4"/><path d="M8 20h8"/><path d="M7 12l3-3.5 2.5 2.5L16 7"/></svg></span><span class="tile-lab">Events</span></a><a class="tile" href="about.html"><span class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-4 3.4-6.4 7.5-6.4s7.5 2.4 7.5 6.4"/></svg></span><span class="tile-lab">About</span></a></nav>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="foot-name">López-Baeza</p>
+      <div class="foot-links">
+      <a href="https://www.linkedin.com/in/jesuslopezbaeza/" rel="me noopener" target="_blank">LinkedIn</a>
+      <a href="https://www.researchgate.net/profile/Jesus-Lopez-Baeza" rel="me noopener" target="_blank">ResearchGate</a>
+      <a href="https://scholar.google.com/citations?user=J8rSZxgAAAAJ" rel="me noopener" target="_blank">Google Scholar</a>
+      <a href="https://orcid.org/0000-0002-4092-1782" rel="me noopener" target="_blank">ORCID</a>
+      <a href="https://instagram.com/lopez.baeza" rel="me noopener" target="_blank">Instagram</a>
+      </div>
+    </div>
+    <p class="colophon">Urban science · data · public space — Alicante, Spain</p>
+  </div>
+</footer>
+<script>
+document.querySelectorAll('.carousel').forEach(function(c){
+  var t = c.querySelector('.track');
+  function step(){ return Math.max(t.clientWidth * 0.8, 240); }
+  c.querySelector('.prev').onclick = function(){ t.scrollBy({left:-step(), behavior:'smooth'}); };
+  c.querySelector('.next').onclick = function(){ t.scrollBy({left: step(), behavior:'smooth'}); };
+});
+
+document.querySelectorAll('.vid-link').forEach(function (a) {
+  a.addEventListener('click', function (ev) {
+    // file:// can't host a YouTube iframe, so there we just follow the link
+    if (location.protocol.indexOf('http') !== 0) return;
+    ev.preventDefault();
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + a.dataset.yt + '?autoplay=1';
+    f.title = a.querySelector('img').alt;
+    f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture';
+    f.allowFullscreen = true;
+    f.setAttribute('frameborder', '0');
+    a.replaceWith(f);
+  });
+});
+</script>
+<script src="assets/filter.js"></script>
+<script src="assets/timeline.js"></script>
+<script src="assets/spark.js"></script>
+</body>
+</html>

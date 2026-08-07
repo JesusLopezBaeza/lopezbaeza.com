@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tools — Jesús López-Baeza</title>
+<meta name="description" content="Interactive dashboards on urban and career data.">
+<meta property="og:title" content="Tools — Jesús López-Baeza">
+<meta property="og:description" content="Interactive dashboards on urban and career data.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="index.html">López-Baeza</a>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="publications.html">Publications</a>
+        <a href="events.html">Events</a>
+        <a href="about.html">About</a>
+        <span class="has-kids is-on" tabindex="0">More <i>+</i><span class="submenu"><a href="tools.html" aria-current="page">Tools</a><a href="architecture.html">Architecture</a><a href="graphic-design.html">Graphic Design</a></span></span>
+    </nav>
+  </div>
+</header>
+<main>
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="kicker">More</span><h2>Tools</h2></div>
+      <div class="body"><p>Small interactive dashboards. More will be added here over time.</p></div>
+    </div>
+    <div class="table">
+<div class="thead"><span>Yr</span><span>Project</span><span>Scope</span><span>Type</span><span></span></div>
+<a class="trow" href="career-map.html"><span class="t-year">2026</span><span class="t-title">Career Map — positions, projects and lectures in space and time</span><span class="t-city">World</span><span class="t-org">Interactive dashboard</span><span class="t-go">&rarr;</span></a>
+</div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="foot-name">López-Baeza</p>
+      <div class="foot-links">
+      <a href="https://www.linkedin.com/in/jesuslopezbaeza/" rel="me noopener" target="_blank">LinkedIn</a>
+      <a href="https://www.researchgate.net/profile/Jesus-Lopez-Baeza" rel="me noopener" target="_blank">ResearchGate</a>
+      <a href="https://scholar.google.com/citations?user=J8rSZxgAAAAJ" rel="me noopener" target="_blank">Google Scholar</a>
+      <a href="https://orcid.org/0000-0002-4092-1782" rel="me noopener" target="_blank">ORCID</a>
+      <a href="https://instagram.com/lopez.baeza" rel="me noopener" target="_blank">Instagram</a>
+      </div>
+    </div>
+    <p class="colophon">Urban science · data · public space — Alicante, Spain</p>
+  </div>
+</footer>
+<script>
+document.querySelectorAll('.carousel').forEach(function(c){
+  var t = c.querySelector('.track');
+  function step(){ return Math.max(t.clientWidth * 0.8, 240); }
+  c.querySelector('.prev').onclick = function(){ t.scrollBy({left:-step(), behavior:'smooth'}); };
+  c.querySelector('.next').onclick = function(){ t.scrollBy({left: step(), behavior:'smooth'}); };
+});
+
+document.querySelectorAll('.vid-link').forEach(function (a) {
+  a.addEventListener('click', function (ev) {
+    // file:// can't host a YouTube iframe, so there we just follow the link
+    if (location.protocol.indexOf('http') !== 0) return;
+    ev.preventDefault();
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + a.dataset.yt + '?autoplay=1';
+    f.title = a.querySelector('img').alt;
+    f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture';
+    f.allowFullscreen = true;
+    f.setAttribute('frameborder', '0');
+    a.replaceWith(f);
+  });
+});
+</script>
+<script src="assets/filter.js"></script>
+<script src="assets/timeline.js"></script>
+<script src="assets/spark.js"></script>
+</body>
+</html>
