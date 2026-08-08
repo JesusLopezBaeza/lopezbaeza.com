@@ -424,16 +424,6 @@ a.pub-title:hover{color:var(--accent)}
   letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
   border:1px solid var(--accent);padding:.05rem .3rem;vertical-align:middle;
   white-space:nowrap}
-.g-brush-sel{position:absolute;top:0;bottom:0;background:rgba(217,51,10,.12);
-  border-left:1px solid var(--accent);border-right:1px solid var(--accent);
-  display:none;pointer-events:none}
-.gantt.is-brushing .g-brush-sel,.gantt.has-brush .g-brush-sel{display:block}
-.g-brush-lab{position:absolute;top:.15rem;font-family:var(--mono);font-size:.55rem;
-  letter-spacing:.06em;color:var(--accent);white-space:nowrap;transform:translateX(-50%)}
-.brush-clear{font:inherit;letter-spacing:inherit;text-transform:inherit;
-  color:var(--accent);background:none;border:1px solid var(--accent);
-  padding:.18rem .45rem;margin-left:.6rem;cursor:pointer}
-.brush-clear:hover{background:var(--accent);color:var(--paper)}
 .trk:hover{color:var(--ink)}
 
 /* ---------------------------------------------------------- gantt */
