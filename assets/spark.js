@@ -65,6 +65,39 @@
     box.addEventListener('mouseenter', function () { clearTimeout(timer); });
     box.addEventListener('mouseleave', hide);
 
+    /* ---- legend doubles as a series filter (multi-series charts) --------- */
+    var keys = Array.prototype.slice.call(fig.querySelectorAll('.sp-key[data-series]'));
+    if (keys.length) {
+      // Same rule as the facet buttons and the timeline tracks: untouched,
+      // every series shows; the first click means "only this one"; after that
+      // the keys behave additively, and emptying the set restores everything.
+      var pristine = true, chosen = {};
+
+      var paint = function () {
+        keys.forEach(function (k) {
+          var i = k.getAttribute('data-series');
+          var on = pristine || !!chosen[i];
+          k.setAttribute('aria-pressed', String(on));
+          var series = fig.querySelector('.sp-series[data-series="' + i + '"]');
+          if (series) series.hidden = !on;
+        });
+        hide();
+      };
+
+      keys.forEach(function (key) {
+        key.addEventListener('click', function () {
+          var i = key.getAttribute('data-series');
+          if (pristine) { pristine = false; chosen = {}; chosen[i] = true; }
+          else if (chosen[i]) {
+            delete chosen[i];
+            if (!Object.keys(chosen).length) pristine = true;
+          } else chosen[i] = true;
+          paint();
+        });
+      });
+      paint();
+    }
+
     /* ---- redraw from a filtered subset ---------------------------------- */
     var pts = Array.prototype.slice.call(fig.querySelectorAll('.sp-pt'));
     if (!pts.length) return;            // the multi-series chart has no points to redraw

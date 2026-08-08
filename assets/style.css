@@ -92,6 +92,11 @@ img{max-width:100%;display:block}
 .tile-lab{font-family:var(--mono);font-size:.58rem;letter-spacing:.11em;
   text-transform:uppercase}
 .tile:hover{background:var(--paper-2);color:var(--accent)}
+/* "More" is a group, not a link — it needs to anchor its own submenu */
+.tile-more{position:relative;cursor:pointer}
+.tile-more .tile-lab i{font-style:normal;color:var(--accent)}
+.tile-more .submenu{top:auto;bottom:calc(100% + .35rem);left:0;right:auto}
+.tile-more:hover .submenu,.tile-more:focus-within .submenu{display:flex}
 
 .cover-papers{padding-top:clamp(1.75rem,3.5vw,2.75rem)}
 .cover-papers .kicker{margin-bottom:.9rem}
@@ -198,7 +203,14 @@ img{max-width:100%;display:block}
 .sp-hit:hover::before,.sp-hit:focus::before{opacity:1}
 
 .sp-legend{display:flex;flex-wrap:wrap;gap:.35rem .9rem;align-items:center}
-.sp-key{display:inline-flex;align-items:center;gap:.35rem;color:var(--muted)}
+.sp-key{display:inline-flex;align-items:center;gap:.35rem;color:var(--muted);
+  font:inherit;letter-spacing:inherit;text-transform:inherit;
+  background:none;border:none;padding:0;cursor:pointer}
+.sp-key:hover{color:var(--accent)}
+/* switched off: the line is hidden, so grey the key right down */
+.sp-key[aria-pressed="false"]{opacity:.38}
+.sp-key[aria-pressed="false"] b{color:var(--muted)}
+.sp-series[hidden]{display:none}
 .sp-key b{color:var(--ink);font-weight:500}
 .sp-key i{width:.85rem;height:0;border-top:2px solid var(--accent)}
 .sp-key.s1 i{border-top-color:var(--ink)}
@@ -361,8 +373,13 @@ a.pub-title:hover{color:var(--accent)}
 .bio-kicker{grid-column:1;grid-row:1}
 .bio-portrait{grid-column:1;grid-row:2;display:flex;flex-direction:column;min-height:0}
 .bio-text{grid-column:2;grid-row:2}
+/* The greyscale filter is applied to a large photograph. Left on the main
+   layer the browser re-runs it on every composite, which is what made this
+   page scroll heavily. Promoting it to its own layer means the filtered
+   bitmap is rasterised once and then just moved. */
 .portrait{border:1px solid var(--rule-strong);filter:grayscale(1) contrast(1.06);
-  width:100%;height:100%;object-fit:cover;object-position:center top}
+  width:100%;height:100%;object-fit:cover;object-position:center top;
+  transform:translateZ(0);will-change:filter;backface-visibility:hidden}
 /* The prose is a two-column flow, but the chart sits outside it: kept in the
    flow it fragmented across the column break, and it could not be pinned to
    the foot of the picture. So bio-text is a vertical stack — lead, prose,
@@ -376,7 +393,7 @@ a.pub-title:hover{color:var(--accent)}
   margin:0 0 1rem;padding-bottom:.85rem;border-bottom:1px solid var(--rule)}
 .bio-foot{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;
   column-gap:clamp(1.25rem,2.5vw,2.5rem)}
-.bio-foot .spark{grid-column:2}
+.bio-foot .spark{grid-column:1/-1}
 
 /* ---------------------------------------------------------- track toggles */
 
@@ -388,11 +405,40 @@ a.pub-title:hover{color:var(--accent)}
 .trk-dot{width:.5rem;height:.5rem;background:var(--rule-strong)}
 .trk[aria-pressed="true"]{color:var(--ink);border-color:var(--ink)}
 .trk[aria-pressed="true"] .trk-dot{background:var(--accent)}
+/* dot-only track: round swatch, matching the dots it governs */
+.trk.is-dots .trk-dot{border-radius:50%}
+/* Events are drawn as black points on the chart, so its swatch says so
+   rather than borrowing the accent square used by the banded tracks. */
+.trk[data-trk="courses"] .trk-dot{border-radius:50%}
+.trk[data-trk="courses"][aria-pressed="true"] .trk-dot{background:var(--ink)}
+
+/* see-full-version link under the About timeline */
+.tl-more{display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--accent);
+  border-bottom:1px solid var(--accent);padding-bottom:2px}
+.tl-more:hover{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* status tag on a project row */
+.t-tag{display:inline-block;margin-left:.5rem;font-family:var(--mono);font-size:.52rem;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+  border:1px solid var(--accent);padding:.05rem .3rem;vertical-align:middle;
+  white-space:nowrap}
+.g-brush-sel{position:absolute;top:0;bottom:0;background:rgba(217,51,10,.12);
+  border-left:1px solid var(--accent);border-right:1px solid var(--accent);
+  display:none;pointer-events:none}
+.gantt.is-brushing .g-brush-sel,.gantt.has-brush .g-brush-sel{display:block}
+.g-brush-lab{position:absolute;top:.15rem;font-family:var(--mono);font-size:.55rem;
+  letter-spacing:.06em;color:var(--accent);white-space:nowrap;transform:translateX(-50%)}
+.brush-clear{font:inherit;letter-spacing:inherit;text-transform:inherit;
+  color:var(--accent);background:none;border:1px solid var(--accent);
+  padding:.18rem .45rem;margin-left:.6rem;cursor:pointer}
+.brush-clear:hover{background:var(--accent);color:var(--paper)}
 .trk:hover{color:var(--ink)}
 
 /* ---------------------------------------------------------- gantt */
 
-.gantt{--lab:13rem;position:relative;margin-top:clamp(1rem,3vw,2rem);
+.gantt{--lab:clamp(16rem,27vw,29rem);position:relative;margin-top:clamp(1rem,3vw,2rem);
   border-top:1px solid var(--rule-strong);font-size:.8rem}
 
 .g-head,.g-foot{display:grid;grid-template-columns:var(--lab) minmax(0,1fr);
@@ -407,17 +453,21 @@ a.pub-title:hover{color:var(--accent)}
   text-transform:uppercase;color:var(--accent);padding:.6rem 0 .35rem}
 
 .g-lane{display:grid;grid-template-columns:var(--lab) minmax(0,1fr);
-  column-gap:.9rem;padding:.28rem 0;border-top:1px solid var(--rule);align-items:center;
+  column-gap:.9rem;padding:.12rem 0;border-top:1px solid var(--rule);align-items:center;
   transition:opacity .15s ease}
 .g-lane:first-of-type{border-top:none}
 .g-lane.is-dim{opacity:.22}
 .g-lane:hover{background:var(--paper-2)}
 
-.g-org{display:flex;flex-direction:column;gap:.05rem;padding-right:.4rem;min-width:0}
+/* Organisation and place run on one line so each row is a single line tall.
+   The label column is wide enough for the longest of them; anything that still
+   overruns is trimmed rather than allowed to wrap and double the row height. */
+.g-org{display:flex;align-items:baseline;gap:.45rem;padding-right:.4rem;
+  min-width:0;white-space:nowrap}
 .g-orgname{font-family:var(--display);font-variation-settings:"wdth" 104,"wght" 600;
-  font-size:.78rem;line-height:1.12;overflow-wrap:anywhere}
+  font-size:.78rem;line-height:1.12;overflow:hidden;text-overflow:ellipsis}
 .g-place{font-family:var(--mono);font-size:.5rem;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--accent)}
+  text-transform:uppercase;color:var(--accent);flex:none}
 
 .g-track{position:relative;height:1rem;
   background:repeating-linear-gradient(to right,
@@ -484,7 +534,9 @@ a.pub-title:hover{color:var(--accent)}
 .cvsplit-map{position:sticky;top:4.5rem}
 .cvsplit-time{min-width:0}
 .cvsplit-time .gantt{--lab:8.5rem;margin-top:0;font-size:.74rem}
-.cvsplit-time .g-orgname{font-size:.7rem}
+.cvsplit-time .g-org{flex-direction:column;align-items:flex-start;gap:.05rem;
+  white-space:normal}
+.cvsplit-time .g-orgname{font-size:.7rem;white-space:normal;overflow-wrap:anywhere}
 .cvsplit-time .g-head{position:sticky;top:3.6rem;background:var(--paper);z-index:3}
 .cvsplit-time .g-foot{display:none}
 .cvsplit-time .g-now{display:none}

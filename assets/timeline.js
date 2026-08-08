@@ -71,8 +71,21 @@
 
     document.addEventListener('tracks:change', function (ev) {
       var on = ev.detail.active;
-      chart.querySelectorAll('[data-track]').forEach(function (band) {
-        band.hidden = on.indexOf(band.getAttribute('data-track')) === -1;
+
+      // Bars and dots each carry their own track. Turning Projects on on its
+      // own therefore strips the bars off the chart and leaves the project
+      // points standing on their rows — which is the point of that toggle.
+      chart.querySelectorAll('[data-track]').forEach(function (el) {
+        el.hidden = on.indexOf(el.getAttribute('data-track')) === -1;
+      });
+
+      // A row with nothing left visible would otherwise sit there as an empty
+      // ruled line, so fold away whatever has no content left.
+      chart.querySelectorAll('.g-lane').forEach(function (lane) {
+        lane.hidden = !lane.querySelector('.g-seg:not([hidden]), .g-dot:not([hidden])');
+      });
+      chart.querySelectorAll('[data-band]').forEach(function (band) {
+        band.hidden = !band.querySelector('.g-lane:not([hidden])');
       });
       hide();
     });
