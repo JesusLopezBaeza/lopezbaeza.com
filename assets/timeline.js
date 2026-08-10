@@ -105,21 +105,44 @@
       var k = t.getAttribute('data-trk');
       t.setAttribute('aria-pressed', String(pristine || !!chosen[k]));
     });
+    document.querySelectorAll('[data-group]').forEach(function (g) {
+      var keys = g.getAttribute('data-group').split(',');
+      var on = keys.filter(function (k) { return pristine || chosen[k]; }).length;
+      g.setAttribute('aria-pressed', String(on === keys.length));
+      // part of the group showing: neither fully on nor fully off
+      g.classList.toggle('is-part', on > 0 && on < keys.length);
+    });
+  }
+
+  /* Pick a set: the same rule as one button, applied to several keys at once.
+     Untouched, choosing a group means "only these"; once a selection exists the
+     group adds or removes its members together. */
+  function choose(keys) {
+    if (pristine) {
+      pristine = false;
+      chosen = {};
+      keys.forEach(function (k) { chosen[k] = true; });
+      return;
+    }
+    var allIn = keys.every(function (k) { return chosen[k]; });
+    keys.forEach(function (k) {
+      if (allIn) delete chosen[k]; else chosen[k] = true;
+    });
+    if (!Object.keys(chosen).length) pristine = true;       // back to everything
   }
 
   toggles.forEach(function (t) {
     t.addEventListener('click', function () {
-      var k = t.getAttribute('data-trk');
-      if (pristine) {
-        pristine = false;
-        chosen = {};
-        chosen[k] = true;
-      } else if (chosen[k]) {
-        delete chosen[k];
-        if (!Object.keys(chosen).length) pristine = true;   // back to everything
-      } else {
-        chosen[k] = true;
-      }
+      choose([t.getAttribute('data-trk')]);
+      paint();
+      broadcast();
+    });
+  });
+
+  var groups = Array.prototype.slice.call(document.querySelectorAll('[data-group]'));
+  groups.forEach(function (g) {
+    g.addEventListener('click', function () {
+      choose(g.getAttribute('data-group').split(','));
       paint();
       broadcast();
     });

@@ -774,3 +774,21 @@ a.pub-title:hover{color:var(--accent)}
    the "i" and turn its text into flex items */
 .stat > span,.statbar > span,.statrad > figcaption{display:flex;align-items:center}
 .statbar > span{flex-wrap:wrap;gap:.15rem}
+/* publications are black points on the chart, like events — say so on the swatch */
+.trk[data-trk="publications"] .trk-dot{border-radius:50%}
+.trk[data-trk="publications"][aria-pressed="true"] .trk-dot{background:var(--ink)}
+
+/* two families of toggles, each with a rule and a label that switches all
+   three of its members together */
+.tracks{gap:.35rem 1.5rem;align-items:flex-start}
+.trk-group{display:flex;flex-direction:column;gap:.3rem}
+.trk-row{display:flex;flex-wrap:wrap;gap:.35rem}
+.trk-all{font-family:var(--mono);font-size:.5rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;
+  background:none;border:none;border-top:1.5px solid var(--rule-strong);
+  padding:.3rem 0 0;width:100%;text-align:center;
+  transition:color .14s ease,border-color .14s ease}
+.trk-all:hover{color:var(--accent);border-top-color:var(--accent)}
+.trk-all[aria-pressed="true"]{color:var(--ink);border-top-color:var(--accent)}
+.trk-all.is-part{color:var(--muted);border-top-color:var(--rule-strong);
+  border-top-style:dashed}
