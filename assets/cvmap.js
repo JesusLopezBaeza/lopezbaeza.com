@@ -8,7 +8,8 @@
   var root = document.getElementById('cvmap');
   if (!root) return;
 
-  var DATA = JSON.parse(document.getElementById('cvdata').textContent);
+  var BASE = JSON.parse(document.getElementById('cvdata').textContent);
+  var DATA = BASE;
   var svg = root.querySelector('svg');
   var gLand = svg.querySelector('.m-land');
   var gPts = svg.querySelector('.m-points');
@@ -17,6 +18,7 @@
   var NS = 'http://www.w3.org/2000/svg';
   var W = 1000, H = 500, LAT0 = 83, LAT1 = -56;
   var active = null;   // null = everything
+  var span = null;     // null = every year, else {from, to} from the rail
   var view = {x: 0, y: 0, k: 1};   // pan/zoom state, k = 1 is the whole world
 
   function proj(lon, lat) {
@@ -172,9 +174,12 @@
 
   /* ---------------- points ---------------- */
   function render() {
-    var rows = active ? DATA.filter(function (d) {
-      return active.indexOf(d.track) !== -1;
-    }) : DATA;
+    var rows = DATA.filter(function (d) {
+      if (active && active.indexOf(d.track) === -1) return false;
+      // a spell of work counts as inside the window if it overlaps it at all
+      if (span && (Math.ceil(d.end) < span.from || Math.floor(d.start) > span.to)) return false;
+      return true;
+    });
 
     var byCity = {};
     rows.forEach(function (d) {
@@ -272,6 +277,17 @@
 
   document.addEventListener('tracks:change', function (ev) {
     active = ev.detail.active;
+    render();
+  });
+
+  document.addEventListener('years:change', function (ev) {
+    span = ev.detail;
+    render();
+  });
+
+  // the import panel swaps the whole dataset out and back again
+  document.addEventListener('mapdata:change', function (ev) {
+    DATA = ev.detail || BASE;
     render();
   });
 
