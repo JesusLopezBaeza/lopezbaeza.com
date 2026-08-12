@@ -1,7 +1,7 @@
 # lopezbaeza.com — how to run this site
 
 A plain static website. No Wix, no WordPress, no monthly fee. The only thing you
-pay for is the domain name, roughly **€10–12 a year**.
+pay for is the domain name.
 
 ---
 
