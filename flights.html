@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flight Log — Jesús López-Baeza</title>
+<meta name="description" content="Every flight you have taken, drawn and cross-filtered in your browser.">
+<meta property="og:title" content="Flight Log — Jesús López-Baeza">
+<meta property="og:description" content="Every flight you have taken, drawn and cross-filtered in your browser.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/style.css?v=6adce490">
+</head>
+<body>
+<header class="masthead">
+  <div class="mast-in">
+    <a class="brand" href="index.html">López-Baeza</a>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="publications.html">Publications</a>
+        <a href="events.html">Events</a>
+        <a href="about.html">About</a>
+        <span class="has-kids is-on" tabindex="0">More <i>+</i><span class="submenu"><a href="tools.html" aria-current="page">Tools</a><a href="mailto:jesus.lopez@spinunit.org">Contact</a></span></span>
+    </nav>
+  </div>
+</header>
+<main>
+<section class="section" id="fl" data-airports="assets/airports.js?v=d893ed74">
+  <div class="wrap">
+    <a class="back" href="tools.html">&larr; Tools</a>
+    <div class="section-head">
+      <div>
+        <h2>Flight Log</h2>
+        <p class="body">Drop a flight diary on this page and it becomes a map, a
+        column of figures and seven charts that filter one another. Everything starts
+        switched on: click a bar or a segment to drop it, and the map and every other
+        panel narrow to match. The file is read in your browser; nothing is uploaded
+        and nothing is kept.</p>
+      </div>
+    </div>
+
+    <div id="fl-drop" class="fl-drop">
+      <h3>Drop your flight diary here</h3>
+      <p class="fl-sub">A <b>flightdiary.net</b> CSV export works as it comes. So does
+      the template, as .xlsx or .csv.</p>
+      <div class="fl-actions">
+        <a class="fl-btn" href="assets/flight-template.xlsx" download>Download template</a>
+        <button class="fl-btn is-primary" type="button" id="fl-pick">Upload your file</button>
+        <span class="fl-info" tabindex="0" role="note" aria-label="How your file is handled">i<span class="fl-pop">
+          <b>Download the template, fill in your flights, then click Upload your file
+          to see the dashboard.</b>
+          No data is uploaded and nothing is stored. The file is read in your own
+          browser, no copy is kept and nothing is sent anywhere. Close the tab and it
+          is gone. Airport coordinates come from a table served with this page, which
+          is the only thing it loads.
+        </span></span>
+      </div>
+      <input type="file" id="fl-file" accept=".csv,.xlsx,.xlsm,.xls" hidden>
+      <p class="fl-err" id="fl-err" hidden></p>
+    </div>
+
+    <div id="fl-app" hidden>
+      <div class="fl-bar">
+        <div class="fl-controls">
+          <label class="fl-ctl">Colour by
+            <select id="fl-colorby">
+              <option value="reason" selected>Purpose</option>
+              <option value="airline">Airline</option>
+              <option value="aircraft">Aircraft</option>
+            </select>
+          </label>
+          <label class="fl-ctl">Projection
+            <select id="fl-projection">
+              <option value="natural earth" selected>Natural Earth</option>
+              <option value="equirectangular">Equirectangular</option>
+              <option value="orthographic">Globe</option>
+              <option value="mercator">Mercator</option>
+              <option value="mollweide">Mollweide</option>
+              <option value="azimuthal equal area">Azimuthal</option>
+            </select>
+          </label>
+          <label class="fl-ctl is-check"><input type="checkbox" id="fl-airports"> Label airports</label>
+        </div>
+        <!-- on the control line rather than above the figures, so the map and
+             the figures beside it start at the same height -->
+        <div class="fl-chips" id="fl-chips"></div>
+        <p class="fl-meta" id="fl-meta"></p>
+      </div>
+
+      <!-- map and figures share a row and a height -->
+      <div class="fl-top">
+        <div class="fl-mapbox">
+          <div class="fl-map" id="fl-map"></div>
+          <!-- the legend is ours, not Plotly's: it has to list every category
+               in the diary whether or not that category is currently drawn -->
+          <div class="fl-legend" id="fl-legend"></div>
+        </div>
+        <div class="fl-side">
+          <div class="kpis fl-cells" id="fl-kpis">
+            <div class="stat" data-s="legs"><span>Flights<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Legs in the current selection. A return trip counts as two.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="rate"><span>Per year<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Flights divided by the number of years the selection spans — first year to last, not the whole diary.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat is-delta" data-s="last"><span>Last full year<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Flights in the last complete calendar year, against the year before it. The current year is still running, so it is left out of the comparison.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="permonth"><span>Per active month<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Flights divided by the number of distinct months that contain at least one flight.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="km"><span>Distance<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Great-circle distance between airports, summed. Your file does not carry distances — these are computed from the coordinates, so they are shorter than the track actually flown.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="laps"><span>Earth laps<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Total distance divided by 40,075 km, the equatorial circumference.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="moon"><span>To the Moon<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Total distance divided by 384,400 km, the mean Earth–Moon distance. Below one whole trip it is shown as a percentage of the way there.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="hours"><span>Air time<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Recorded durations, summed. Where a row has no duration it is estimated at 800 km/h plus half an hour, and the label says so.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="avgleg"><span>Average leg<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Total distance divided by the number of legs.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="avgdur"><span>Average duration<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Air time divided by the number of legs.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="longest"><span>Longest leg<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The single longest flight in the selection, in kilometres.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="shortest"><span>Shortest leg<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The single shortest flight in the selection.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="airports"><span>Airports<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Distinct airports appearing as either origin or destination.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="countries"><span>Countries<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Distinct countries of the airports touched, from the built-in airport table.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="airlines"><span>Airlines<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Distinct airlines in the selection.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="aircraft"><span>Most flown<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The aircraft type appearing most often, and its share.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="tails"><span>Tail numbers<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Distinct registrations — individual aircraft rather than types. Only counts rows where a registration was recorded.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="busyyear"><span>Busiest year<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The year holding the most flights in the selection.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="busymonth"><span>Busiest month<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The calendar month with most flights across all years — which month of the year you fly, not which month.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="gap"><span>Longest gap<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The widest interval between two consecutive flights, in days.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="since"><span>Days since<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Days between today and the most recent flight in the selection.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="first"><span>First flight<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The earliest flight in the file. Not affected by filters.</span></span></span><b>&mdash;</b><i></i></div>
+            <div class="stat" data-s="recent"><span>Latest flight<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The most recent flight in the file. Not affected by filters.</span></span></span><b>&mdash;</b><i></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fl-ladder" data-ladder>
+        <div class="fl-lad-head">
+          <b id="fl-lad-km">&mdash;</b>
+          <span class="fl-hint">the marks are explained on hover · logarithmic scale</span>
+          <span class="fl-lad-alt" id="fl-lad-v">&mdash;</span>
+        </div>
+        <div class="fl-lad-t" id="fl-lad-t" tabindex="0">
+          <i id="fl-lad-fill"></i>
+          <span class="fl-lad-pop" id="fl-lad-pop"></span>
+        </div>
+        <div class="fl-lad-ax" id="fl-lad-ax"></div>
+      </div>
+
+      <div class="kpis fl-bars" id="fl-bars">
+        <div class="statbar" data-bar="spread-airline"><span>Airline spread<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Normalised Shannon entropy over airlines: 0% means every flight is on one carrier, 100% means they are spread evenly across all of them. Dividing by log(number of airlines) is what lets this be compared with the bars beside it.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="spread-route"><span>Route spread<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The same index over routes, treating A→B and B→A as one route. Low means a commute; high means you rarely fly the same pair twice.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="spread-aircraft"><span>Aircraft spread<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The same index over aircraft types.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="spread-country"><span>Country spread<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The same index over the country flown to, falling back to the country flown from where the destination could not be placed.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="longhaul"><span>Long-haul share<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Share of legs of 4,000 km or more — the conventional long-haul threshold.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="returns"><span>Matched returns<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Share of legs belonging to an even number of flights on the same unordered route. A rough reading of how often a trip out came back the same way.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="cabin"><span>Dominant cabin<span class="wi" tabindex="0" role="note">i<span class="wi-pop">The most common travel class and its share of the selection.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="business"><span>Flown for work<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Share of legs recorded with a work-related purpose.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+        <div class="statbar" data-bar="domestic"><span>Same country<span class="wi" tabindex="0" role="note">i<span class="wi-pop">Share of legs that begin and end in the same country.</span></span></span><b>&mdash;</b><div class="statbar-t"><i></i></div><em></em></div>
+      </div>
+
+      <div class="fl-grid">
+          <figure class="fl-w" data-w="year">
+            <figcaption><span class="fl-wt">Flights per year</span><span class="fl-hint">Click a point to see only that year.</span><span class="fl-wtools"><button class="fl-clear" type="button" data-clear="year" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot"><div id="fl-w-year"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="route">
+            <figcaption><span class="fl-wt">Routes</span><span class="fl-hint">A→B and B→A counted together. Click to isolate.</span><span class="fl-wtools"><button class="fl-sort" type="button" data-sort="route" aria-label="Reverse the order">&darr;</button><button class="fl-clear" type="button" data-clear="route" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot is-scroll"><div id="fl-w-route"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="month">
+            <figcaption><span class="fl-wt">By month of year</span><span class="fl-hint">Which month you fly, across all years. Click to isolate.</span><span class="fl-wtools"><button class="fl-clear" type="button" data-clear="month" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot"><div id="fl-w-month"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="dow">
+            <figcaption><span class="fl-wt">By day of week</span><span class="fl-hint">Which day you fly, across all years. Click to isolate.</span><span class="fl-wtools"><button class="fl-clear" type="button" data-clear="dow" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot"><div id="fl-w-dow"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="reason">
+            <figcaption><span class="fl-wt">Purpose</span><span class="fl-hint">Click a segment to see only that one.</span><span class="fl-wtools"><button class="fl-clear" type="button" data-clear="reason" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot is-donut"><div id="fl-w-reason"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="class">
+            <figcaption><span class="fl-wt">Travel class</span><span class="fl-hint">Click a segment to see only that one.</span><span class="fl-wtools"><button class="fl-clear" type="button" data-clear="class" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot is-donut"><div id="fl-w-class"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="airline">
+            <figcaption><span class="fl-wt">Airlines</span><span class="fl-hint">Scroll for the full ranking.</span><span class="fl-wtools"><button class="fl-sort" type="button" data-sort="airline" aria-label="Reverse the order">&darr;</button><button class="fl-clear" type="button" data-clear="airline" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot is-scroll"><div id="fl-w-airline"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="airport">
+            <figcaption><span class="fl-wt">Airports</span><span class="fl-hint">Both ends of every leg count. Click to isolate.</span><span class="fl-wtools"><button class="fl-sort" type="button" data-sort="airport" aria-label="Reverse the order">&darr;</button><button class="fl-clear" type="button" data-clear="airport" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot is-scroll"><div id="fl-w-airport"></div></div>
+          </figure>
+          <figure class="fl-w" data-w="aircraft">
+            <figcaption><span class="fl-wt">Aircraft types</span><span class="fl-hint">Scroll for the full ranking.</span><span class="fl-wtools"><button class="fl-sort" type="button" data-sort="aircraft" aria-label="Reverse the order">&darr;</button><button class="fl-clear" type="button" data-clear="aircraft" hidden>Clear</button></span></figcaption>
+            <div class="fl-plot is-scroll"><div id="fl-w-aircraft"></div></div>
+          </figure>
+      </div>
+
+      <div class="fl-tablewrap" id="fl-table"></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <p class="foot-name">López-Baeza</p>
+      <div class="foot-links">
+      <a href="https://www.linkedin.com/in/jesuslopezbaeza/" rel="me noopener" target="_blank">LinkedIn</a>
+      <a href="https://www.researchgate.net/profile/Jesus-Lopez-Baeza" rel="me noopener" target="_blank">ResearchGate</a>
+      <a href="https://scholar.google.com/citations?user=J8rSZxgAAAAJ" rel="me noopener" target="_blank">Google Scholar</a>
+      <a href="https://orcid.org/0000-0002-4092-1782" rel="me noopener" target="_blank">ORCID</a>
+      <a href="https://instagram.com/lopez.baeza" rel="me noopener" target="_blank">Instagram</a>
+      </div>
+    </div>
+    <p class="colophon"><a href="index.html">lopezbaeza.com</a></p>
+  </div>
+</footer>
+<script>
+document.querySelectorAll('.carousel').forEach(function(c){
+  var t = c.querySelector('.track');
+  function step(){ return Math.max(t.clientWidth * 0.8, 240); }
+  c.querySelector('.prev').onclick = function(){ t.scrollBy({left:-step(), behavior:'smooth'}); };
+  c.querySelector('.next').onclick = function(){ t.scrollBy({left: step(), behavior:'smooth'}); };
+});
+
+document.querySelectorAll('.vid-link').forEach(function (a) {
+  a.addEventListener('click', function (ev) {
+    // file:// can't host a YouTube iframe, so there we just follow the link
+    if (location.protocol.indexOf('http') !== 0) return;
+    ev.preventDefault();
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + a.dataset.yt + '?autoplay=1';
+    f.title = a.querySelector('img').alt;
+    f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture';
+    f.allowFullscreen = true;
+    f.setAttribute('frameborder', '0');
+    a.replaceWith(f);
+  });
+});
+</script>
+<script src="assets/wi.js?v=f2f666fa"></script>
+<script src="assets/filter.js?v=83b50b9c"></script>
+<script src="assets/timeline.js?v=4cbc760e"></script>
+<script src="assets/spark.js?v=9d6b259e"></script>
+<script src="assets/flkpi.js?v=569fc575"></script>
+<script src="assets/flights.js?v=242b4e40"></script>
+</body>
+</html>

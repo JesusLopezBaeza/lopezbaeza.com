@@ -269,25 +269,9 @@
     ['input', 'change'].forEach(function (t) { birthEl.addEventListener(t, render); });
   }
 
-  /* Keep every "i" bubble on screen. Which widget sits at an edge depends on
-     how many columns the grid has resolved to and whether the widget spans the
-     full width, so it is measured on hover rather than guessed in CSS — an
-     earlier nth-child rule sent the full-width bars' bubbles off the left. */
-  root.querySelectorAll('.wi').forEach(function (w) {
-    var pop = w.querySelector('.wi-pop');
-    if (!pop) return;
-    function place() {
-      var pad = 10;
-      pop.style.left = '0px';
-      var icon = w.getBoundingClientRect();
-      var box = pop.getBoundingClientRect();
-      var shift = 0;
-      if (box.right > window.innerWidth - pad) shift = window.innerWidth - pad - box.right;
-      if (box.left + shift < pad) shift = pad - box.left;
-      pop.style.left = shift + 'px';
-    }
-    ['mouseenter', 'focus'].forEach(function (t) { w.addEventListener(t, place); });
-  });
+  /* The "i" bubbles are placed by wi.js, which every page loads — the rule it
+     has to satisfy (never be clipped by a scrolling ancestor) turned up on the
+     Flight Log, and one implementation is better than two. */
 
   document.addEventListener('tracks:change', function (ev) { tracks = ev.detail.active; render(); });
   document.addEventListener('years:change', function (ev) { span = ev.detail; render(); });
